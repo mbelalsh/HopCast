@@ -1,0 +1,10 @@
+args:    
+    data_path: "./../toy_data/exp1d_6500_-1to1.pkl"
+    #train: True
+    n_epochs: 400
+    lr: 0.0001
+    l2_reg: 0.0001
+    batch_size: 64
+    n_components: 4
+    layers: 2
+    nodes: 100

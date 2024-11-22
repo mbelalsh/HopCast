@@ -1,0 +1,25 @@
+args:    
+    data_path: "./../../toy_data/data_dict_400data_30samp_unimodal_ext.pkl"
+    load_mhn: True
+    # MHN hyperparams
+    seq_len: 8
+    mhn_epochs: 300
+    mhn_lr: 0.0001
+    mhn_l2_reg: 0.0001
+    mhn_batch_size: 14 # START HERE CHANGE BATCH SIZE AND GENERATE MORE DATA
+    num_heads: 1
+    state_dim: 1 # change this for new problem
+    ctx_enc_out: 5 #or4
+    #use_base_enc: True
+    # calibration options
+    mhn_output: 'y' # delta may not work reward_head
+    calib_horizon: 201 # prepare_hopfield_data skips episodes lower than this to avoid padding for MHN batch training so choose carefully
+    cp_sampling: ['sampling', 1000] # For 'sampling' pass no of samples from dist. and for 'topk' pass no of top k probs. you want to pick
+    cp_aggregate: 'long_seq'
+    cp_alphas: 14 # 9
+    cp_replacement: True # Not important for topk
+    num_mhn_models: 3 # change to 3 for shared_encoder
+    ood_pred: True
+# exp1D_5100_-6to2: dropout: 0.0, ctx_enc_out: 10, num_mhn_models: 3, mhn_batch_size: 3, seq_len: 40, mem_len = 100
+# exp1D_6500_-6to6: dropout: 0.0, ctx_enc_out: 13, num_mhn_models: 3, mhn_batch_size: 14, seq_len: 6, mem_len = 100
+# exp1D_8000_-6to10: dropout: 0.0, ctx_enc_out: 13, num_mhn_models: 3, mhn_batch_size: 14, seq_len: 6, mem_len = 100
