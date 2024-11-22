@@ -1,0 +1,21 @@
+args:    
+    data_path: "./lorenz/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_3by10std.pkl"
+    #data_path: "./glycolytic/750traj_t0_to_t4_400ts_data_noisy_justState_3by10std.pkl"
+    #data_path: "./LVolt/500traj_11by10a_4by10b_4by10g_1by10d_t0_to_t30_300ts_data_noisy_3by10std.pkl"
+    #data_path: "./lorenz96/666traj_t0_to_t3_300ts_s-105by10_to_s105by10_data_noisy_justState_3by10std.pkl"
+    #data_path: "./FHNag/350traj_t0_to_t200_400ts_s-15by10_to_s15by10_data_noisy_justState_5by100std.pkl"
+    load_dpEn: True
+    num_models: 15 # Total number of models in the population
+    rand_models: 6 # Models used at the inference time
+    train_val_ratio: 0.8
+    uq_method: moment_matching #trajectory_sampling moment_matching expectation
+    n_particles: 20
+    #one_step: True
+    # deep ensemble hyperparams
+    bayesian: True
+    epochs: 1000
+    model_lr: 0.001
+    l2_reg_multiplier: 0.01
+    batch_size: 128 # START HERE CHANGE BATCH SIZE AND GENERATE MORE DATA
+    num_nodes: 400 # 400 for 2 layers for LV and Lorenz
+    num_layers: 2

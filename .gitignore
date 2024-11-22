@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+**/*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# the folder with the testing files [Bilal]
+my_folder/
+attn_data/
+attn_data_temp_scale/
+dp_data/
+tcn_attn_data/
+toy_data/
+mdn_data/
+.pt_tmp/
+lightning_logs/
+lorenz/
+glycolytic/
+LVolt/
+lorenz96/
+FHNag/
+
+# vs code settings 
+.vscode/
