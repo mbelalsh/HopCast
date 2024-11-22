@@ -32,7 +32,7 @@ attn_data/
 attn_data_temp_scale/
 dp_data/
 tcn_attn_data/
-toy_data/
+#toy_data/
 mdn_data/
 .pt_tmp/
 lightning_logs/

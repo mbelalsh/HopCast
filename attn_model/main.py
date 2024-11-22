@@ -2,9 +2,7 @@ import argparse
 import yaml
 from typing import Dict, Tuple
 from prepare_data import DataProcessor
-from train_hopfield import TrainHopfield
 from train_hopfield_same_enc import TrainHopfieldSameEnc
-from train_hopfield_one_enc import TrainHopfieldOneEnc
 from utils import set_seed
 import torch
 import os, pickle
