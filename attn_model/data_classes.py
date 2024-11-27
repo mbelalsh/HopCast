@@ -97,9 +97,7 @@ class EnsembleValLoader(Dataset):
         self._errors = errors    
         self._Y = Y
         self._Y_pred = Y_pred
-        print(self._Y.shape)
         
-
     def __len__(self):
         return self._X_ctx_true.shape[1]
 
