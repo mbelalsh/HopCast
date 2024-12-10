@@ -24,7 +24,10 @@ python data_generation/glycolytic.py --noise_level 0.3
 
 ## MHN 
 
-We will train deterministic ensemble and then pick the first model from the ensemble to generate residuals for the MHN to learn. The residual file will be saved if it does not already exit. The results for deterministic ensembles will be generated at the same time and saved as `pkl` files. It would suffice to train just one deterministic model to generate residuals, but we will train an ensemble and generate results for deterministic ensembles as well.
+We will train deterministic ensemble and then pick the first model from the ensemble to generate residuals for the MHN to learn. The residual file will be saved if it does not already exit. The results for deterministic ensembles will be generated at the same time and saved as `pkl` files. It would suffice to train just one deterministic model to generate residuals, but we will train an ensemble and generate results for deterministic ensembles as well. 
+
+To generate results for sigma = 0.1, replace 3by10 in the following commands by 1by10
+To generate results for sigma = 0.5, replace 3by10 in the following commands by 5by100
 
 ### Glycolytic
 
