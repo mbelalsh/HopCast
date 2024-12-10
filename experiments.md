@@ -37,10 +37,22 @@ python main.py --yaml_file yml_files/model_params_glycolytic_3by10.yml --num_lay
 python main.py --yaml_file yml_files/model_params_glycolytic_3by10.yml --load_dpEn True --rand_models 6 --num_layers 3
 cd ..
 cd attn_model
-##### Train MHN
+##### Train MHN (one for each state dimension of glycolytic)
 python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_0out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_1out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_2out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_3out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_4out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_5out.yml
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_6out.yml
 ##### Test MHN
 python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_0out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_1out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_2out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_3out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_4out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_5out.yml --load_mhn True
+python main.py --yaml_file yml_files/glycolytic_3by10/model_params_glycolytic_3by10_6out.yml --load_mhn True
 ```
 
 ## Probabilistic Ensembles
