@@ -1,18 +1,15 @@
 args:    
     seed: 2
-    #data_path: "./../../../my_folder/results/residuals_data/cs2_2017-01-01_2019-01-01_200step_200int.csv"
     #data_path: "./../../ode_models/lorenz/checkpoints/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_3by10std/0seed_dpEn_400nod_2lay_0.001lr_0.01l2/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_3by10std_errors.csv"
     #data_path: "./../../ode_models/glycolytic/checkpoints/750traj_t0_to_t4_400ts_data_noisy_justState_1by10std/0seed_dpEn_400nod_3lay_0.001lr_0.01l2/750traj_t0_to_t4_400ts_data_noisy_justState_1by10std_errors.csv"
-    data_path: "./../../ode_models/LVolt/checkpoints/500traj_11by10a_4by10b_4by10g_1by10d_t0_to_t30_300ts_data_noisy_5by100std/0seed_dpEn_400nod_2lay_0.001lr_0.01l2/500traj_11by10a_4by10b_4by10g_1by10d_t0_to_t30_300ts_data_noisy_5by100std_errors.csv"
+    #data_path: "./../../ode_models/LVolt/checkpoints/500traj_11by10a_4by10b_4by10g_1by10d_t0_to_t30_300ts_data_noisy_5by100std/0seed_dpEn_400nod_2lay_0.001lr_0.01l2/500traj_11by10a_4by10b_4by10g_1by10d_t0_to_t30_300ts_data_noisy_5by100std_errors.csv"
     #data_path: "./../../ode_models/lorenz96/checkpoints/666traj_t0_to_t3_300ts_s-105by10_to_s105by10_data_noisy_justState_3by10std/0seed_dpEn_400nod_3lay_0.001lr_0.01l2/666traj_t0_to_t3_300ts_s-105by10_to_s105by10_data_noisy_justState_3by10std_errors.csv"
     #data_path: "./../../ode_models/FHNag/checkpoints/350traj_t0_to_t200_400ts_s-15by10_to_s15by10_data_noisy_justState_1by10std/0seed_dpEn_400nod_2lay_0.001lr_0.01l2/350traj_t0_to_t200_400ts_s-15by10_to_s15by10_data_noisy_justState_1by10std_errors.csv"
-    #cs2_2017-01-01_2019-01-01_200step_200int.csv
-    #cs2_2017-01-01_2017-02-01_200step_10int.csv
-    temp_scale: True
+    #temp_scale: True
     #memory_dim: 2.4
-    load_mhn: True
+    #load_mhn: True
     data_type: "synthetic"
-    ode_name: LVolt #force_model
+    ode_name: glycolytic #force_model
     out: 1 # 0(2k,), 1(2k,2k), 2(2k,2k), 3(2k,), 4(2k,)
     # MHN hyperparams
     seq_len: 7 # 1000 or 800 with 4 out #500 #4000 #5000
@@ -26,7 +23,7 @@ args:
     #use_base_enc: True
     # calibration options
     mhn_output: 'y' # delta may not work reward_head
-    calib_horizon: 299 #299 #201 # prepare_hopfield_data skips episodes lower than this to avoid padding for MHN batch training so choose carefully
+    calib_horizon: 299 #299 #201 
     cp_sampling: ['sampling', 1000] # For 'sampling' pass no of samples from dist. and for 'topk' pass no of top k probs. you want to pick
     cp_aggregate: 'long_seq'
     cp_alphas: 12 # 9
@@ -40,11 +37,3 @@ args:
     init_cond_ctxt: True
     #mirrorless_enc: True
     #pos_enc: True
-# Below for mhn_model_shared    
-# 461 rand_data
-# 462 same data
-# 463 Without base enc (rand_data)
-# 664 Without base enc (rand_data)
-# 665 Without base enc (rand_data) -- 5 ctx_enc_out
-# 666 Without base enc (rand_data) -- 45 ctx_enc_out
-# 667 Without base enc (rand_data) -- 10 ctx_enc_out

@@ -1,0 +1,35 @@
+args:    
+    seed: 2
+    data_path: "./../../ode_models/lorenz/checkpoints/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_1by10std/0seed_dpEn_400nod_2lay_0.001lr_0.01l2/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_1by10std_errors.csv"
+    #temp_scale: True
+    #memory_dim: 2.4
+    #load_mhn: True
+    data_type: "synthetic"
+    ode_name: lorenz #force_model
+    out: 3 # 0(2k,), 1(2k,2k), 2(2k,2k), 3(2k,), 4(2k,)
+    # MHN hyperparams
+    seq_len: 300 # 1000 or 800 with 4 out #500 #4000 #5000
+    mhn_epochs: 162 #100 #362 #665
+    mhn_lr: 0.001
+    mhn_l2_reg: 0.001
+    mhn_batch_size: 4 #8 # START HERE CHANGE BATCH SIZE AND GENERATE MORE DATA
+    num_heads: 1
+    state_dim: 6 #6 # change this for new problem
+    ctx_enc_out: 4
+    #use_base_enc: True
+    # calibration options
+    mhn_output: 'y' # delta may not work reward_head
+    calib_horizon: 299 #299 #201 
+    cp_sampling: ['sampling', 1000] # For 'sampling' pass no of samples from dist. and for 'topk' pass no of top k probs. you want to pick
+    cp_aggregate: 'long_seq'
+    cp_alphas: 12 # 9
+    cp_replacement: True # Not important for topk
+    num_mhn_models: 3 #6 # change to 3 for shared_encoder
+    # context options
+    past_ts_ctxt: 5 #8 # 0 means no time context, 1 means current timestep
+    past_feat_ctxt: 1 # 1 means just current timestep feature, 2 means past 1 step feature context
+    past_pred_ctxt: 0 # 0 means no pred context, 1 means past one step pred context
+    #just_ts_ctxt: True # if True. past_ts_ctxt = int, past_feat_ctxt = 0, past_pred_ctxt = 0
+    init_cond_ctxt: True
+    #mirrorless_enc: True
+    #pos_enc: True
