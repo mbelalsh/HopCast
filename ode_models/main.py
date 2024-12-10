@@ -28,7 +28,7 @@ def train(params: Dict):
     if params['bayesian']:
         unc_prop = UncPropDeepEns(params, deep_en)
     else:    
-        unc_prop = UncPropagate(params, deep_en)
+        unc_prop = UncPropagate(params, deep_en)   
 
     if not params['load_dpEn']:
         deep_en.set_loaders()

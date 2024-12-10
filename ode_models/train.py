@@ -106,6 +106,7 @@ class Ensemble(object):
         val_improve = deque(maxlen=4)
         lr_lower = False
         min_model_epochs = 0 if not min_model_epochs else min_model_epochs
+        print("Training model...")
 
         ### check validation before first training epoch
         improved_any, iter_best_loss = self.check_validation_losses(self.validation_loader)
