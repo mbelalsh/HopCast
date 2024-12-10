@@ -1,0 +1,17 @@
+args:    
+    data_path: "./lorenz/1000traj_t0_to_t3_10sig_28rho_8by3beta_300ts_data_noisy_3by10std.pkl"
+    #load_dpEn: True
+    num_models: 15 # Total number of models in the population
+    rand_models: 6 # Models used at the inference time
+    train_val_ratio: 0.8
+    uq_method: moment_matching #trajectory_sampling moment_matching expectation
+    n_particles: 20
+    #one_step: True
+    # deep ensemble hyperparams
+    #bayesian: True
+    epochs: 1000
+    model_lr: 0.001
+    l2_reg_multiplier: 0.01
+    batch_size: 128 # START HERE CHANGE BATCH SIZE AND GENERATE MORE DATA
+    num_nodes: 400 # 400 for 2 layers for LV and Lorenz
+    num_layers: 2
