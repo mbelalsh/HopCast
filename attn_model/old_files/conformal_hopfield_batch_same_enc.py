@@ -1,8 +1,7 @@
 from os import error
 from statistics import variance
 from matplotlib import axes
-from ray import state
-from sympy import sequence, true
+from sympy import true
 import torch 
 import torch.nn as nn
 from data_classes import FcModel, MemoryData
@@ -11,9 +10,7 @@ import math
 from hflayers import Hopfield
 from utils import plot_part_mhn, MeanStdevFilter
 import torch.nn.functional as F
-from scipy import stats
 import pickle
-import numpy as np
 import sys
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -41,9 +38,7 @@ class ConformHopfieldBatchSameEnc(nn.Module):
             self.heads = nn.ModuleDict({str(i): FcModel(ctx_enc_out,ctx_enc_out, hidden=(200,200)) # (400,400) (200,200)
                                         for i in range(self.mhn_models)}) 
         else: 
-            hidden = (100,)
-            print(f"The Hidden is: {hidden}")
-            self.heads = nn.ModuleDict({str(i): FcModel(ctx_enc_in,ctx_enc_out, hidden=hidden) # (100,) (400,400) (200,200), (100,100,100), (400,400,400), (800,800,800)
+            self.heads = nn.ModuleDict({str(i): FcModel(ctx_enc_in,ctx_enc_out, hidden=(100,)) # (100,) (400,400) (200,200) (400,400,400)
                                         for i in range(self.mhn_models)})                 
         self._hopfield_heads = self._params['num_heads'] # for now
         self._hopfield_hidden = ctx_enc_out
@@ -75,9 +70,7 @@ class ConformHopfieldBatchSameEnc(nn.Module):
                             normalize_pattern_projection=False,
                             normalize_pattern_projection_affine=False,
                             # do not post-process layer output
-                            state_pattern_as_static=True, # True
-                            stored_pattern_as_static=True, # True
-                            pattern_projection_as_static=True, # True
+                            pattern_projection_as_static=True,
                             disable_out_projection=True                 # To get Heads - one head per epsilon
                             ) for i in range(self.mhn_models)})
         if self._use_base_enc:
@@ -438,30 +431,6 @@ class ConformHopfieldBatchSameEnc(nn.Module):
         
         return smoothed_data   
 
-    def z_scores(self):
-        """Calculates the z-scores for given set of quantiles in a standard normal"""
-        lower_alphas = np.array(self._alphas)
-        upper_alphas = 1 - lower_alphas
-
-        lower_z_score = torch.Tensor(stats.norm.ppf(lower_alphas)).to(device).unsqueeze(-1).unsqueeze(-1)
-        upper_z_score = torch.Tensor(stats.norm.ppf(upper_alphas)).to(device).unsqueeze(-1).unsqueeze(-1)
-
-        return lower_z_score, upper_z_score   
-
-    def _select_quantiles_gauss(self, expected_actions: torch.Tensor,\
-                                 variance_actions: torch.Tensor, upper_z_score: torch.Tensor):
-        """
-        :param unnorm_mu: [batch_size*seq_len,1] normalized predictions in tensor
-        :param unnorm_var: [batch_size*seq_len,1] predicted logvar in tensor
-        :param upper_z_scores: [self._alphas,1,1]
-        """
-        actions_upper =  expected_actions.unsqueeze(0) \
-            + torch.mul(variance_actions.sqrt().unsqueeze(0), upper_z_score) # [alphas,examples,dp_outs]
-        actions_lower =  expected_actions.unsqueeze(0) - \
-            torch.mul(variance_actions.sqrt().unsqueeze(0), upper_z_score) # upper is fine since we are subtracting
-
-        return actions_lower.squeeze(-1), actions_upper.squeeze(-1)         
-
     
     def evaluate(self, _data: List[torch.Tensor], batch_idx: int, unc_prop: bool=False):
         """
@@ -481,29 +450,24 @@ class ConformHopfieldBatchSameEnc(nn.Module):
 
         total_mem = self._mem_data[0].X_ctx_true_train_enc.shape[0]
 
-        #mem_len = 70
-        #start = 0
-
+        mem_len = 100
+        start = 0
         # randomly pick mem_len no of examples from memory
-        #rand_mem = torch.randint(low=0, high=total_mem, size=(mem_len,))
-        mem_size = 2000
+        rand_mem = torch.randint(low=0, high=total_mem, size=(mem_len,))
+
         if self._params['cp_aggregate'] == 'long_seq':
 
             # STITCH TOGETHER MANY EPISODES AS ONE BIG EPISODE AND THEN SAMPLE
             for m in range(self.mhn_models):
-                total_size = self._mem_data[m].X_ctx_true_train.shape[0]*self._mem_data[m].X_ctx_true_train.shape[1]
                 if len(self._errors_samp_seq[m]) == 0: 
                     # _mem_data.X_ctx_true_train_enc [4978, 200, 61], 
                     # _mem_data.error_train [4978, 200, 6]
-
-                    self._X_ctx_true_seq[m] = self._mem_data[m].X_ctx_true_train\
-                            .reshape(-1,self.ctx_enc_in)[:mem_size,:].to(device) # [30k,19]
-                    
-                    self._X_ctx_true_enc_seq[m] = self._mem_data[m].X_ctx_true_train_enc\
-                                                .reshape(-1,self.ctx_enc_out)[:mem_size,:].to(device) # [30k,19]
-                    self._errors_samp_seq[m] = self._mem_data[m].error_train\
-                        .reshape(-1,y_pred_m.shape[-1])[:mem_size,:].to(device) # [30k,6]
-    
+                    self._X_ctx_true_seq[m] = self._mem_data[m].X_ctx_true_train[start:start+mem_len]\
+                            .reshape(-1,self.ctx_enc_in).to(device) # [30k,19]
+                    self._X_ctx_true_enc_seq[m] = self._mem_data[m].X_ctx_true_train_enc[start:start+mem_len]\
+                                                .reshape(-1,self.ctx_enc_out).to(device) # [30k,19]
+                    self._errors_samp_seq[m] = self._mem_data[m].error_train[start:start+mem_len]\
+                        .reshape(-1,y_pred_m.shape[-1]).to(device) # [30k,6]
             if batch_idx == 0:
                 print(f"The memory length is: {len(self._X_ctx_true_enc_seq[0])}")            
 
@@ -539,19 +503,15 @@ class ConformHopfieldBatchSameEnc(nn.Module):
                 assoc_dict = {}
                 assoc_dict['assoc_mat'] = assoc_mat.squeeze(0).squeeze(0).reshape(X_ctx_sim.shape[0],\
                                                                 X_ctx_sim.shape[1],-1).detach().cpu().numpy()
-                #assoc_dict['errors_mem'] = self._errors_samp_seq[hop_id].reshape(mem_len,-1,y_pred.shape[-1]).detach().cpu().numpy()
-                assoc_dict['errors_mem'] = self._errors_samp_seq[hop_id].reshape(-1,y_pred.shape[-1]).detach().cpu().numpy()
+                assoc_dict['errors_mem'] = self._errors_samp_seq[hop_id].reshape(mem_len,-1,y_pred.shape[-1]).detach().cpu().numpy()
                 if self._params['data_type'] == 'synthetic':
                     assoc_dict['y_pred'] = y_pred.detach().cpu().numpy()
                     assoc_dict['y_true'] = y.detach().cpu().numpy()
                     assoc_dict['x_mem'] = self.input_filter.invert_torch(self._X_ctx_true_seq[m]).detach().cpu().numpy()
-                
+
                 #if batch_idx == 0: 
                     #pickle.dump(assoc_dict, open(save_dir + f'/assoc_data_{batch_idx}_TrainValseq.pkl', 'wb'))
-                #pickle.dump(assoc_dict, open(save_dir + f'/assoc_data_{hop_id}out_{batch_idx}bs.pkl', 'wb'))
-                # memory statistics 
-                mem_dict = {"total_size": total_size, "mem_size": mem_size}
-                pickle.dump(mem_dict, open(save_dir + f'/mem_dict_{mem_size}.pkl', 'wb'))
+                pickle.dump(assoc_dict, open(save_dir + f'/assoc_data_{hop_id}out_{batch_idx}bs.pkl', 'wb'))
 
                 y_low, y_high, errors_low, errors_high, calib_scores,\
                       mses, nlls, wink_scores, pi_widths = [], [], [], [], [], [], [], [], []
@@ -592,8 +552,12 @@ class ConformHopfieldBatchSameEnc(nn.Module):
                         wink_score, pi_width = self._winkler_score(errors, _errors_low, _errors_high) 
                         wink_scores.append(wink_score.unsqueeze(0))
                         pi_widths.append(pi_width.unsqueeze(0))
-                    """    
-                    #else:   
+                    else:   
+                    """
+                    #if hop_id == 3:
+                    #    print(variance_errors)
+                    #    sys.exit()
+
                     nll = self.nll(selected_y.reshape(batch_size*seq_len,-1), \
                                 y_expected_temp.reshape(batch_size*seq_len,1), \
                                     variance_y.unsqueeze(-1), y[:,:,self._which_out].unsqueeze(-1)) 
@@ -608,15 +572,7 @@ class ConformHopfieldBatchSameEnc(nn.Module):
                     calib_score = self.calibration_score(y_low_temp.reshape(len(self._alphas),-1),\
                                                         y_high_temp.reshape(len(self._alphas),-1),\
                                                         y[:,:,self._which_out].unsqueeze(-1))
-                    calib_scores.append(calib_score.unsqueeze(0))  
-                    
-                    # calibration error based on the approximate Gaussian
-                    #lower_z_score, upper_z_score = self.z_scores()
-                    #_y_low_gau, _y_high_gau =\
-                    #    self._select_quantiles_gauss(y_expected_temp.squeeze().unsqueeze(-1), variance_y.unsqueeze(-1), upper_z_score)
-
-                    #calib_score = self.calibration_score(_y_low_gau, _y_high_gau, y[:,:,self._which_out].unsqueeze(-1))
-                    #calib_scores.append(calib_score.unsqueeze(0))
+                    calib_scores.append(calib_score.unsqueeze(0))                    
 
                     # Winkler scores and PI-widths on unnormalized y
                     wink_score, pi_width = self._winkler_score(y[:,:,self._which_out].unsqueeze(-1),\
@@ -681,4 +637,4 @@ class ConformHopfieldBatchSameEnc(nn.Module):
         y_pred = y_pred_m[:,:,:,self._which_out].permute(0,2,1)
         errors = errors_m[:,:,:,self._which_out].permute(0,2,1)
 
-        return (y, y_pred, y_low_out, y_high_out, errors, errors_low_out, errors_high_out, calib_scores_out, mses_out, nlls_out, wink_score_out, pi_width_out, mem_size)
+        return (y, y_pred, y_low_out, y_high_out, errors, errors_low_out, errors_high_out, calib_scores_out, mses_out, nlls_out, wink_score_out, pi_width_out)

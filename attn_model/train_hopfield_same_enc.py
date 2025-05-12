@@ -234,8 +234,8 @@ class TrainHopfieldSameEnc:
 
                 # want to have 32 examples for plotting 
                 samples_processed += val_data[0].shape[0]
-                if samples_processed >= samp_to_viz:
-                    break
+                #if samples_processed >= samp_to_viz:
+                #    break
         #print(val_out_error.error_low[:,1,:,150,:])        
         #print(val_out_error.error_high[:,1,:,150,:]) 
 
